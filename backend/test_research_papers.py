@@ -4,10 +4,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from database import Base, get_db
-from main import app
-from routers.auth import get_authenticated_user
-from models import ResearchPaper
+from app.db.base import Base
+from app.db.session import get_db
+from app.main import app
+from app.dependencies.auth import get_current_user
+from app.models.research_paper import ResearchPaper
 
 
 # Test database
@@ -16,13 +17,13 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     connect_args={"check_same_thread": False},
-    poolclass=StaticPool
+    poolclass=StaticPool,
 )
 
 TestingSessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
-    bind=engine
+    bind=engine,
 )
 
 
@@ -39,65 +40,98 @@ def override_get_authenticated_user():
     return {
         "id": 1,
         "email": "test@example.com",
-        "role": "Researcher"
+        "role": "Researcher",
     }
 
-
-app.dependency_overrides[get_db] = override_get_db
-app.dependency_overrides[get_authenticated_user] = override_get_authenticated_user
 
 client = TestClient(app)
 
 
 @pytest.fixture(autouse=True)
 def setup_db():
-    Base.metadata.create_all(bind=engine)
+    # Save any existing dependency overrides
+    previous_get_db = app.dependency_overrides.get(get_db)
+    previous_get_current_user = app.dependency_overrides.get(
+        get_current_user
+    )
 
-    db = TestingSessionLocal()
+    # Set overrides for this test database
+    app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_current_user] = (
+        override_get_authenticated_user
+    )
 
-    papers = [
-        ResearchPaper(
-            title="Generative AI for Healthcare",
-            authors="John Smith, Priya Kumar",
-            abstract="Study of generative AI applications in healthcare.",
-            publication_year=2025,
-            research_area="Artificial Intelligence",
-            keywords="Generative AI, Healthcare, Machine Learning",
-            journal="AI Research Journal",
-            doi="10.1234/test.001",
-            pdf_url="https://example.com/paper1.pdf"
-        ),
-        ResearchPaper(
-            title="Machine Learning in Agriculture",
-            authors="David Brown",
-            abstract="Machine learning techniques for smart agriculture.",
-            publication_year=2024,
-            research_area="Machine Learning",
-            keywords="Machine Learning, Agriculture",
-            journal="Agriculture Journal",
-            doi="10.1234/test.002",
-            pdf_url="https://example.com/paper2.pdf"
-        ),
-        ResearchPaper(
-            title="Deep Learning for Medical Imaging",
-            authors="John Smith",
-            abstract="Deep learning methods for medical image analysis.",
-            publication_year=2025,
-            research_area="Artificial Intelligence",
-            keywords="Deep Learning, Medical Imaging",
-            journal="Medical AI Journal",
-            doi="10.1234/test.003",
-            pdf_url="https://example.com/paper3.pdf"
-        )
-    ]
+    try:
+        # Create database tables
+        Base.metadata.create_all(bind=engine)
 
-    db.add_all(papers)
-    db.commit()
-    db.close()
+        db = TestingSessionLocal()
+        try:
+            papers = [
+                ResearchPaper(
+                    title="Generative AI for Healthcare",
+                    authors="John Smith, Priya Kumar",
+                    abstract=(
+                        "Study of generative AI applications in healthcare."
+                    ),
+                    publication_year=2025,
+                    research_area="Artificial Intelligence",
+                    keywords="Generative AI, Healthcare, Machine Learning",
+                    journal="AI Research Journal",
+                    doi="10.1234/test.001",
+                    pdf_url="https://example.com/paper1.pdf",
+                ),
+                ResearchPaper(
+                    title="Machine Learning in Agriculture",
+                    authors="David Brown",
+                    abstract=(
+                        "Machine learning techniques for smart agriculture."
+                    ),
+                    publication_year=2024,
+                    research_area="Machine Learning",
+                    keywords="Machine Learning, Agriculture",
+                    journal="Agriculture Journal",
+                    doi="10.1234/test.002",
+                    pdf_url="https://example.com/paper2.pdf",
+                ),
+                ResearchPaper(
+                    title="Deep Learning for Medical Imaging",
+                    authors="John Smith",
+                    abstract=(
+                        "Deep learning methods for medical image analysis."
+                    ),
+                    publication_year=2025,
+                    research_area="Artificial Intelligence",
+                    keywords="Deep Learning, Medical Imaging",
+                    journal="Medical AI Journal",
+                    doi="10.1234/test.003",
+                    pdf_url="https://example.com/paper3.pdf",
+                ),
+            ]
 
-    yield
+            db.add_all(papers)
+            db.commit()
+        finally:
+            db.close()
 
-    Base.metadata.drop_all(bind=engine)
+        yield
+
+    finally:
+        # Clean up test tables
+        Base.metadata.drop_all(bind=engine)
+
+        # Restore previous dependency overrides
+        if previous_get_db is None:
+            app.dependency_overrides.pop(get_db, None)
+        else:
+            app.dependency_overrides[get_db] = previous_get_db
+
+        if previous_get_current_user is None:
+            app.dependency_overrides.pop(get_current_user, None)
+        else:
+            app.dependency_overrides[get_current_user] = (
+                previous_get_current_user
+            )
 
 
 def test_search_research_papers():
@@ -115,7 +149,7 @@ def test_search_research_papers():
 def test_keyword_filter():
     response = client.get(
         "/api/research-papers",
-        params={"keyword": "Healthcare"}
+        params={"keyword": "Healthcare"},
     )
 
     assert response.status_code == 200
@@ -130,7 +164,7 @@ def test_keyword_filter():
 def test_year_filter():
     response = client.get(
         "/api/research-papers",
-        params={"year": 2025}
+        params={"year": 2025},
     )
 
     assert response.status_code == 200
@@ -143,7 +177,7 @@ def test_year_filter():
 def test_author_filter():
     response = client.get(
         "/api/research-papers",
-        params={"author": "John Smith"}
+        params={"author": "John Smith"},
     )
 
     assert response.status_code == 200
@@ -156,7 +190,7 @@ def test_author_filter():
 def test_research_area_filter():
     response = client.get(
         "/api/research-papers",
-        params={"research_area": "Artificial Intelligence"}
+        params={"research_area": "Artificial Intelligence"},
     )
 
     assert response.status_code == 200
@@ -171,8 +205,8 @@ def test_pagination():
         "/api/research-papers",
         params={
             "page": 1,
-            "page_size": 2
-        }
+            "page_size": 2,
+        },
     )
 
     assert response.status_code == 200
@@ -189,17 +223,19 @@ def test_sorting():
         "/api/research-papers",
         params={
             "sort_by": "publication_year",
-            "sort_order": "desc"
-        }
+            "sort_order": "desc",
+        },
     )
 
     assert response.status_code == 200
 
     data = response.json()
-
     items = data["data"]["items"]
 
-    assert items[0]["publication_year"] >= items[1]["publication_year"]
+    assert (
+        items[0]["publication_year"]
+        >= items[1]["publication_year"]
+    )
 
 
 def test_get_research_paper_details():
@@ -223,11 +259,17 @@ def test_research_paper_not_found():
 
     assert data["success"] is False
     assert data["message"] == "Research paper not found."
+
+
 def test_research_papers_requires_auth():
-    app.dependency_overrides.pop(get_authenticated_user, None)
+    # Temporarily remove authentication override
+    app.dependency_overrides.pop(get_current_user, None)
 
-    response = client.get("/api/research-papers")
-
-    assert response.status_code in (401, 403)
-
-    app.dependency_overrides[get_authenticated_user] = override_get_authenticated_user
+    try:
+        response = client.get("/api/research-papers")
+        assert response.status_code in (401, 403)
+    finally:
+        # Restore the fake authenticated user
+        app.dependency_overrides[get_current_user] = (
+            override_get_authenticated_user
+        )

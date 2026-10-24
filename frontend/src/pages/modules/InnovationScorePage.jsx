@@ -81,9 +81,9 @@ export default function InnovationScorePage() {
 
       if (list.length > 0) {
         const firstId =
+          list[0].id ||
           list[0].technology_id ||
-          list[0].technologyId ||
-          list[0].id;
+          list[0].technologyId;
 
         if (firstId) {
           setSelectedTechId(String(firstId));
@@ -134,9 +134,9 @@ export default function InnovationScorePage() {
     return technologies.find(
       (technology) =>
         String(
-          technology.technology_id ||
-            technology.technologyId ||
-            technology.id
+          technology.id ||
+            technology.technology_id ||
+            technology.technologyId
         ) === String(selectedTechId)
     );
   }, [technologies, selectedTechId]);
@@ -223,9 +223,9 @@ export default function InnovationScorePage() {
             >
               {technologies.map((technology) => {
                 const id =
+                  technology.id ||
                   technology.technology_id ||
-                  technology.technologyId ||
-                  technology.id;
+                  technology.technologyId;
 
                 const name =
                   technology.name ||

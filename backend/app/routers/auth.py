@@ -1,3 +1,4 @@
+from fastapi.responses import JSONResponse
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import RedirectResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -34,29 +35,66 @@ def register(
     payload: RegisterRequest,
     db: Session = Depends(get_db)
 ):
-    user = register_user(db, payload)
+    try:
+        user = register_user(db, payload)
+        token = issue_token(user)
+        return {
+            "success": True,
+            "message": "User registered successfully.",
+            "data": {
+                "access_token": token,
+                "token_type": "bearer",
+                "user": {
+                    "id": user.id,
+                    "name": user.name,
+                    "email": user.email,
+                    "role": user.role,
+                },
+            },
+        }
+    except HTTPException as exc:
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={
+                "success": False,
+                "message": (
+                    "An account with this email already exists."
+                    if exc.status_code == 409
+                    else str(exc.detail)
+                ),
+            },
+        )
 
-    return {
-        "id": user.id,
-        "name": user.name,
-        "email": user.email,
-        "role": user.role,
-        "message": "User registered successfully",
-    }
 
-
-@router.post("/login", response_model=TokenResponse)
+@router.post("/login")
 def login(
     payload: LoginRequest,
     db: Session = Depends(get_db)
 ):
-    user = authenticate_user(db, payload)
-
-    return TokenResponse(
-        access_token=issue_token(user),
-        role=user.role,
-        user_id=user.id,
-    )
+    try:
+        user = authenticate_user(db, payload)
+        return {
+            "success": True,
+            "message": "Login successful.",
+            "data": {
+                "access_token": issue_token(user),
+                "token_type": "bearer",
+                "user": {
+                    "id": user.id,
+                    "name": user.name,
+                    "email": user.email,
+                    "role": user.role,
+                },
+            },
+        }
+    except HTTPException as exc:
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={
+                "success": False,
+                "message": (str(exc.detail) + "." if str(exc.detail) == "Invalid email or password" else str(exc.detail)),
+            },
+        )
 
 
 @router.post("/google", response_model=TokenResponse)

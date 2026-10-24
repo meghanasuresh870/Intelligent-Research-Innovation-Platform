@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -17,7 +17,14 @@ class ResearchPaperBase(BaseModel):
 
 
 class ResearchPaperCreate(ResearchPaperBase):
-    pass
+    external_id: Optional[str] = None
+    source: str = "openalex"
+    authors: list[str] = Field(default_factory=list)
+    keywords: list[str] = Field(default_factory=list)
+    research_area: list[str] = Field(default_factory=list)
+    publication_date: Optional[date] = None
+    source_url: Optional[str] = None
+    open_access_url: Optional[str] = None
 
 
 class ResearchPaperResponse(ResearchPaperBase):
@@ -26,3 +33,11 @@ class ResearchPaperResponse(ResearchPaperBase):
     id: int
     created_at: datetime
     updated_at: datetime
+
+
+class SyncSummary(BaseModel):
+    fetched: int = 0
+    inserted: int = 0
+    updated: int = 0
+    skipped_duplicates: int = 0
+    failed: int = 0

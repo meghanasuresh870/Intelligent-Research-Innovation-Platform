@@ -1,6 +1,7 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -88,10 +89,7 @@ def get_research_paper(
     paper = get_paper(db, paper_id)
 
     if not paper:
-        raise HTTPException(
-            status_code=404,
-            detail="Research paper not found.",
-        )
+        return JSONResponse(status_code=404, content={"success": False, "message": "Research paper not found."})
 
     return {
         "success": True,

@@ -1,7 +1,12 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+# Load .env from the backend folder
+BACKEND_ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
 
 
 class Settings(BaseSettings):
@@ -24,21 +29,18 @@ class Settings(BaseSettings):
         default="http://localhost:5173"
     )
 
-    GOOGLE_CLIENT_ID: str = Field(
-        default=""
-    )
-    GOOGLE_CLIENT_SECRET: str = Field(
-        default=""
-    )
+    GOOGLE_CLIENT_ID: str = Field(default="")
+    GOOGLE_CLIENT_SECRET: str = Field(default="")
+
     GOOGLE_REDIRECT_URI: str = Field(
         default="http://127.0.0.1:8000/auth/google/callback"
     )
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=BACKEND_ENV_FILE,
         env_file_encoding="utf-8",
         case_sensitive=True,
-        extra="ignore"
+        extra="ignore",
     )
 
     @field_validator("CORS_ORIGINS")

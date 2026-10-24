@@ -6,13 +6,13 @@ __pycache__/
 .pytest_cache/
 venv/
 .venv/
-*.db
-*.sqlite3
 
 # Node / Frontend
 node_modules/
 dist/
 .vite/
+
+# Logs
 *.log
 
 # System & IDE
@@ -20,4 +20,25 @@ dist/
 Thumbs.db
 .vscode/
 .idea/
+
+# Environment secrets
 .env
+.env.*
+!.env.example
+!.env.*.example
+
+# Local databases
+*.db
+*.sqlite3
+
+# Local backups and temporary integration scripts
+copilot_integration_backup/
+profile-fix-backup-*/
+ui-layout-backup-*/
+patch_copilot_db.py
+patch_copilot_main.py
+patch_copilot_router.py
+
+# Local audit reports and backup files
+frontend/PROJECT_AUDIT_REPORT.txt
+*.bak

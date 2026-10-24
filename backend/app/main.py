@@ -1,4 +1,7 @@
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
@@ -10,6 +13,15 @@ from app.routers import (
     users,
     research_papers,
     module7_member5,
+    funding,
+    technologies,
+    module7_member4,
+    innovation_router,
+    commercialization_engine,
+    dashboard,
+    innovation_score_engine,
+    notifications,
+    copilot,
 )
 
 settings = get_settings()
@@ -20,11 +32,31 @@ app = FastAPI(
     description="Authentication and research profile management API.",
 )
 
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=422,
+        content=jsonable_encoder({
+            "success": False,
+            "message": "Input validation failed.",
+            "errors": exc.errors(),
+        }),
+    )
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
         "http://localhost:5174",
+        "http://localhost:5175",
+        "http://localhost:5176",
+        "http://localhost:5177",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://127.0.0.1:5175",
+        "http://127.0.0.1:5176",
+        "http://127.0.0.1:5177",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -41,7 +73,7 @@ def startup() -> None:
 def read_root():
     return {
         "message": "Research Funding & Innovation Intelligence Platform API",
-        "status": "ok",
+        "status": "online",
     }
 
 
@@ -74,3 +106,27 @@ app.include_router(research_papers.router)
 
 # Module 7 - Member 5 - Innovation Scoring
 app.include_router(module7_member5.router)
+
+# Additional module routers
+app.include_router(funding.router, prefix="/api/funding")
+app.include_router(technologies.router)
+app.include_router(module7_member4.router, prefix="/api")
+app.include_router(innovation_router.router)
+# Module 8 - Commercialization
+
+app.include_router(commercialization_engine.router)
+
+# Module 9 - Dashboard
+
+app.include_router(dashboard.router)
+
+# Innovation Score Engine
+
+app.include_router(innovation_score_engine.router)
+
+# Notifications
+
+app.include_router(notifications.router)
+
+# Research Discovery & Innovation Copilot
+app.include_router(copilot.router)
