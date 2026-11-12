@@ -46,13 +46,21 @@ async def validation_exception_handler(request, exc):
 
 
 # CORS Configuration
+allowed_origins = [
+    origin.strip().rstrip("/")
+    for origin in settings.CORS_ORIGINS.split(",")
+    if origin.strip()
+]
+
+# Explicitly allow deployed Vercel frontend
+vercel_origin = "https://intelligent-research-innovation-pla.vercel.app"
+
+if vercel_origin not in allowed_origins:
+    allowed_origins.append(vercel_origin)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        origin.strip()
-        for origin in settings.CORS_ORIGINS.split(",")
-        if origin.strip()
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
