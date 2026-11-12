@@ -44,19 +44,14 @@ async def validation_exception_handler(request, exc):
         }),
     )
 
+
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
-        "http://localhost:5176",
-        "http://localhost:5177",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-        "http://127.0.0.1:5175",
-        "http://127.0.0.1:5176",
-        "http://127.0.0.1:5177",
+        origin.strip()
+        for origin in settings.CORS_ORIGINS.split(",")
+        if origin.strip()
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -112,20 +107,17 @@ app.include_router(funding.router, prefix="/api/funding")
 app.include_router(technologies.router)
 app.include_router(module7_member4.router, prefix="/api")
 app.include_router(innovation_router.router)
-# Module 8 - Commercialization
 
+# Module 8 - Commercialization
 app.include_router(commercialization_engine.router)
 
 # Module 9 - Dashboard
-
 app.include_router(dashboard.router)
 
 # Innovation Score Engine
-
 app.include_router(innovation_score_engine.router)
 
 # Notifications
-
 app.include_router(notifications.router)
 
 # Research Discovery & Innovation Copilot
