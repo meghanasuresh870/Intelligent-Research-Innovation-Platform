@@ -467,21 +467,21 @@ export default function CopilotPage() {
                     className="copilot-chip"
                     disabled={isLoading}
                   >
-                    ΓÜí Neuromorphic Bio-signals
+                    Neuromorphic Bio-signals
                   </button>
                   <button
                     onClick={() => launchDirectTopic('Multi-Agent LLMs for Automated Scientific Hypothesis Generation', 'Artificial Intelligence')}
                     className="copilot-chip"
                     disabled={isLoading}
                   >
-                    ≡ƒñû Multi-Agent LLMs
+                    Multi-Agent LLMs
                   </button>
                   <button
                     onClick={() => launchDirectTopic('Solid-State Electrolytes for High-Density Grid Energy Storage', 'Renewable Energy')}
                     className="copilot-chip"
                     disabled={isLoading}
                   >
-                    ≡ƒöï Solid-State Batteries
+                    Solid-State Batteries
                   </button>
                 </div>
               </div>
@@ -563,28 +563,28 @@ export default function CopilotPage() {
                 className="suggestion-chip"
                 disabled={isLoading}
               >
-                ≡ƒö¼ Discover Real Papers (Stage 2)
+                <FileText size={14} /> Discover Real Papers (Stage 2)
               </button>
               <button
                 onClick={() => handleSendMessage('Perform comparative gap analysis to find what remains unsolved', 3)}
                 className="suggestion-chip"
                 disabled={isLoading}
               >
-                ≡ƒº⌐ Map Unsolved Gaps (Stage 3)
+                <HelpCircle size={14} /> Map Unsolved Gaps (Stage 3)
               </button>
               <button
                 onClick={() => handleSendMessage('Suggest concrete, high-feasibility research ideas for my profile', 4)}
                 className="suggestion-chip"
                 disabled={isLoading}
               >
-                ≡ƒÆí Brainstorm Candidate Ideas (Stage 4)
+                <Lightbulb size={14} /> Brainstorm Candidate Ideas (Stage 4)
               </button>
               <button
                 onClick={() => handleSendMessage('Explain this in simpler terms with another everyday analogy')}
                 className="suggestion-chip"
                 disabled={isLoading}
               >
-                ≡ƒæ╢ Explain More Simply
+                <BookOpen size={14} /> Explain More Simply
               </button>
             </div>
 
@@ -954,7 +954,7 @@ function renderStage1Card(data) {
 
       {analogy && (
         <div className="analogy-banner">
-          <div className="analogy-icon">≡ƒÆí</div>
+          <div className="analogy-icon"><Lightbulb size={22} /></div>
           <div className="analogy-text">
             <strong>Everyday Analogy:</strong> {analogy}
           </div>
@@ -1327,7 +1327,7 @@ function renderStage5Card(data, onDownloadPDF) {
         <div className="synergies-grid mt-4">
           {funding_synergies.length > 0 && (
             <div className="synergy-card funding">
-              <span className="synergy-title">≡ƒÆ░ Module 4: Funding Opportunities</span>
+              <span className="synergy-title"><Award size={16} /> Module 4: Funding Opportunities</span>
               <ul className="synergy-list">
                 {funding_synergies.map((f, i) => (
                   <li key={i}>{f}</li>
@@ -1338,7 +1338,7 @@ function renderStage5Card(data, onDownloadPDF) {
 
           {patent_synergies.length > 0 && (
             <div className="synergy-card patent">
-              <span className="synergy-title">≡ƒ¢í∩╕Å Module 5: Patent Landscape</span>
+              <span className="synergy-title"><FileText size={16} /> Module 5: Patent Landscape</span>
               <ul className="synergy-list">
                 {patent_synergies.map((p, i) => (
                   <li key={i}>{p}</li>
