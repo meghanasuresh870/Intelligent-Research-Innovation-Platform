@@ -15,11 +15,11 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-// Module ID â†’ App route mapping (for implemented modules)
+// Module ID → App route mapping (for implemented modules)
 const MODULE_LAUNCH = {
-  '03': { path: '/research', label: 'Launch Module 3 (Research) â†’' },
-  '02': { path: '/funding', label: 'Launch Module 4 (Funding) â†’' },
-  '04': { path: '/patents', label: 'Launch Module 5 (Patents) â†’' },
+  '03': { path: '/research', label: 'Launch Module 3 (Research) →' },
+  '02': { path: '/funding', label: 'Launch Module 4 (Funding) →' },
+  '04': { path: '/patents', label: 'Launch Module 5 (Patents) →' },
 };
 
 export default function ModuleCard({ module, index }) {

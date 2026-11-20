@@ -59,7 +59,7 @@ export default function Footer() {
 
         <div className="footer-bottom">
           <div className="footer-copy">
-            Â© {year} Research Funding &amp; Innovation Intelligence Platform. All rights reserved.
+            &copy; {year} Research Funding &amp; Innovation Intelligence Platform. All rights reserved.
           </div>
           <div className="footer-bottom-links">
             <span className="footer-link">Privacy</span>

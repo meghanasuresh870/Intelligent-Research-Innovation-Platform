@@ -28,7 +28,7 @@ export default function NotificationsPage() {
                   {a.icon}
                   <div>
                     <h4 style={{ margin: "0 0 2px", fontSize: "0.9rem", color: "#0f172a" }}>{a.title}</h4>
-                    <span style={{ fontSize: "0.74rem", color: "#64748b" }}>{a.type} â€¢ {a.time}</span>
+                    <span style={{ fontSize: "0.74rem", color: "#64748b" }}>{a.type} • {a.time}</span>
                   </div>
                 </div>
                 <span className="badge-pub-type type-journal">Active</span>

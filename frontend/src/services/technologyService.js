@@ -1,5 +1,5 @@
 /**
- * Technology Intelligence Service â€“ Module 6
+ * Technology Intelligence Service – Module 6
  * Frontend API calls for technologies, maturity, adoption, opportunities, and competitors.
  */
 import { apiRequest } from './api';
